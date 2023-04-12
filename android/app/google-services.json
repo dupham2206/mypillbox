@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "819860305643",
+    "project_id": "vaipe-d25a8",
+    "storage_bucket": "vaipe-d25a8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:819860305643:android:b87bbbb73036942fb030ae",
+        "android_client_info": {
+          "package_name": "org.pytorch.live.example"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "819860305643-npfd664ooktq0458650ue233nhvj8l4q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB2kEQ0JGtYL--y_lrk-Gt87_9Ilsa7Yo8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "819860305643-npfd664ooktq0458650ue233nhvj8l4q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
