@@ -5,12 +5,12 @@ import Swiper from 'react-native-swiper';
 import TurnBack from '../src/component/TurnBackView';
 import { useGlobalState, SCREEN_STATES } from "../src/component/GlobalHook";
 
-export default function OCRResultScreen() {
+export default function OCRResultScreen({handleResetOCR}) {
   const [OCRData, setOCRData] = useGlobalState('OCRData');
 
   return (
     <View style={styles.container}>
-      <TurnBack backgroundColorText={null} colorText="white" text="Đặt lịch uống thuốc" />
+      <TurnBack backgroundColorText={null} colorText="white" text="Đặt lịch uống thuốc" handleReset={handleResetOCR}/>
       <Swiper style={styles.swiper} showsButtons={true}>
         {OCRData.map((name, index) => {
           return (<OCRInformation index={index} key={index} />);
@@ -26,5 +26,6 @@ const styles = StyleSheet.create({
   },
   swiper: {
     // marginTop: "10%",
+    // height: "90%",
   }
 });

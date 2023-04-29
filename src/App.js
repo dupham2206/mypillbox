@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useCallback, useState, useEffect } from 'react';
-import { StyleSheet, Text } from "react-native";
+import { Dimensions, StyleSheet, Text } from "react-native";
 import { SafeAreaView, View } from 'react-native-safe-area-context';
 import PillCameraScreen from '../screens/PillCameraScreen';
 import PillLoadingScreen from '../screens/PillLoadingScreen';
@@ -39,6 +39,11 @@ export default function App() {
   const [modelMultipleState, setModelMultipleState] = useGlobalState('modelMultipleState')
   const [image, setImage] = useGlobalState('image');
   const [boundingBoxes, setBoundingBoxes] = useGlobalState('boundingBoxes');
+  const [OCRData, setOCRData] = useGlobalState('OCRData')
+  const [cancel, setCancel] = useState(false);
+  const [processPillDone, setProcessPillDone] = useState(false);
+  const [processPresDone, setProcessPresDone] = useState(false);
+
 
 
 
@@ -62,16 +67,32 @@ export default function App() {
   }
 
   async function loadModel() {
-    modelMultiple = await loadModelMultiple()
-    setModelMultipleState(modelMultiple)
-    modelSingle = await loadModelSingle()
-    setModelSingleState(modelSingle)
-    setScreenState(SCREEN_STATES.SEARCH_PILL)
+    if (modelMultiple == null) {
+      modelMultiple = await loadModelMultiple()
+      setModelMultipleState(modelMultiple)
+    }
+    if (modelSingle == null) {
+      modelSingle = await loadModelSingle()
+      setModelSingleState(modelSingle)
+    }
+    if (screenState === SCREEN_STATES.START) {
+      setScreenState(SCREEN_STATES.HOMEPAGE)
+    }
     // AsyncStorage.removeItem('@schedule');
   }
 
   const handleResetPill = useCallback(async () => {
     setScreenState(SCREEN_STATES.HOMEPAGE);
+    resetPill();
+  }, [image]);
+
+  const handleCancelPill = async () => {
+    setCancel(true)
+    setScreenState(SCREEN_STATES.HOMEPAGE);
+    resetPill();
+  }
+
+  const resetPill = async () => {
     if (image != null) {
       await image.release();
     }
@@ -81,11 +102,43 @@ export default function App() {
     setModelMultipleState(modelMultiple);
     setModelSingleState(null)
     setModelSingleState(modelSingle);
-  }, [image, setScreenState]);
+  }
+
+  const handleResetOCR = useCallback(async () => {
+    setScreenState(SCREEN_STATES.HOMEPAGE);
+    resetOCR();
+  }, [image]);
+
+  const handleCancelOCR = async () => {
+    setCancel(true)
+    setScreenState(SCREEN_STATES.HOMEPAGE);
+    resetOCR();
+  }
+
+  const resetOCR = () => {
+    setOCRData([]);
+  }
 
   useEffect(() => {
     loadModel()
-  }, []);
+    console.log("CCC", cancel)
+    if (processPillDone) {
+      setProcessPillDone(false)
+      if (cancel == false) {
+        setScreenState(SCREEN_STATES.PILL_RESULTS)
+      }
+      setCancel(false)
+    }
+    if (processPresDone) {
+      setProcessPresDone(false)
+      console.log("AAA")
+      if (cancel == false) {
+        setScreenState(SCREEN_STATES.OCR_RESULT)
+      }
+      setCancel(false)
+    }
+  }, [processPillDone, processPresDone]);
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -93,12 +146,12 @@ export default function App() {
       <LinearGradient style={styles.container} colors={['#339DAD', '#34D7BE']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}>
         {screenState === SCREEN_STATES.START && <StartScreen />}
         {screenState === SCREEN_STATES.HOMEPAGE && <HomePage />}
-        {screenState === SCREEN_STATES.PILL_CAMERA && (<PillCameraScreen handleReset={handleResetPill} />)}
-        {screenState === SCREEN_STATES.PILL_LOADING && <PillLoadingScreen />}
+        {screenState === SCREEN_STATES.PILL_CAMERA && (<PillCameraScreen handleReset={handleResetPill} setProcessPillDone={setProcessPillDone} />)}
+        {screenState === SCREEN_STATES.PILL_LOADING && <PillLoadingScreen handleReset={handleCancelPill} />}
         {screenState === SCREEN_STATES.PILL_RESULTS && (<PillResultsScreen onReset={handleResetPill} />)}
-        {screenState === SCREEN_STATES.OCR_START && <OCRStartScreen />}
-        {screenState === SCREEN_STATES.OCR_LOADING && <OCRLoadingScreen />}
-        {screenState === SCREEN_STATES.OCR_RESULT && <OCRResultScreen />}
+        {screenState === SCREEN_STATES.OCR_START && <OCRStartScreen handleResetOCR={handleResetOCR} setProcessPresDone={setProcessPresDone} />}
+        {screenState === SCREEN_STATES.OCR_LOADING && <OCRLoadingScreen handleCancelOCR={handleCancelOCR}/>}
+        {screenState === SCREEN_STATES.OCR_RESULT && <OCRResultScreen handleResetOCR={handleResetOCR}/>}
         {screenState === SCREEN_STATES.SCHEDULE && <ScheduleScreen />}
         {screenState === SCREEN_STATES.TIP && <TipScreen />}
         {screenState === SCREEN_STATES.SEARCH_PILL && <SearchPillScreen />}

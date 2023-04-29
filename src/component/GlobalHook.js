@@ -17,6 +17,7 @@ export const SCREEN_STATES = {
   SEARCH_PILL_DETAIL: 11,
 };
 
+let curDate = new Date()
 
 export const { useGlobalState } = createGlobalState({
   screenState: SCREEN_STATES.START,
@@ -28,5 +29,6 @@ export const { useGlobalState } = createGlobalState({
   progressOCR: 0,
   OCRData: [],
   pillChoose: null,
+  dayChoose: curDate.getUTCDate(),
 });
 

@@ -5,12 +5,12 @@ import TurnBack from "../src/component/TurnBackView";
 import FoundationIcon from 'react-native-vector-icons/Foundation';
 import { useGlobalState, SCREEN_STATES } from "../src/component/GlobalHook";
 
-export default function PillLoadingScreen() {
+export default function PillLoadingScreen({handleReset}) {
   const [tipUse, setTipUse] = useGlobalState('tipUse')
 
   return (
     <View style={styles.container}>
-      <TurnBack backgroundColorText={styles.tipContainer.backgroundColor} colorText="black" text="Trích xuất các viên thuốc"/>
+      <TurnBack backgroundColorText={styles.tipContainer.backgroundColor} colorText="black" text="Trích xuất các viên thuốc" handleReset={handleReset}/>
       <View style={styles.tipContainer}>
         <View style={styles.bulbIcon}>
           <FoundationIcon name="lightbulb" size={90} color='#34D7BE' />

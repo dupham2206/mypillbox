@@ -19,7 +19,9 @@ import { Card } from 'react-native-paper';
 import Toast from 'react-native-toast-message';
 import { DataTable } from 'react-native-paper';
 import { useGlobalState, SCREEN_STATES } from "../src/component/GlobalHook";
-
+import { dateToStringYMD } from '../src/ocr/dateToString';
+import { black } from 'react-native-paper/lib/typescript/styles/themes/v2/colors';
+import TurnBack from '../src/component/TurnBackView';
 
 const drug_name_dict = require('../assets/drug_name_dict.json');
 
@@ -34,16 +36,6 @@ const objectColors = [
   '#FFCC00',
   '#FF2D55',
 ];
-
-
-
-const dateToStringYMD = (date: Date) => {
-  let month = date.getMonth() + 1; //months from 1-12
-  let day = date.getDate();
-  let year = date.getFullYear();
-  let newdate = year + "-" + month + "-" + day;
-  return newdate
-}
 
 const getCurPartOfDay = (now: Date) => {
   if (now.getHours() <= 11) {
@@ -212,78 +204,76 @@ export default function PillResultsScreen({ onReset }: any) {
   }, [ctx, layout]);
 
   return (
-    // <View style={styles.container}>
-    <ScrollView style={styles.container}>
-      <View style={styles.gradient}>
-        <Text style={styles.title}>Kết quả nhận dạng thuốc</Text>
-      </View>
-      <View style={styles.allResultContainer}>
-        <View style={styles.marginIsland}></View>
-        {boundingBoxes.map((value: any, index: any) => {
-          // default 
-          let resTitle = "Loại thuốc cần uống";
-          let resDescription = "Không thể phát hiện được tên thuốc"
-          let colorTitle = "#1DD824"
-          let icon = <FontAwesome name="check" size={30} color={colorTitle} />
-          if (value.result == false) {
-            resTitle = 'Sai thuốc!!!';
-            colorTitle = "#E54343";
-            icon = <FontAwesome name="exclamation" size={30} color={colorTitle} />
-          }
-          if (value.name_drug != null) resDescription = value.name_drug
-          return (
-            <View style={styles.resultContainer} key={index}>
-              {icon}
-              <View style={styles.resultTitleContainer}>
-                <Text style={[styles.textStyleResult, { color: colorTitle }]}>{resTitle}</Text>
-                <Text style={styles.textStyleNameDrug}>{resDescription}</Text>
+    <View style={styles.container}>
+      <TurnBack backgroundColorText={null} colorText={"white"} text="Kết quả nhận dạng thuốc" handleReset={onReset} backState={undefined}/>
+      <ScrollView style={styles.container}>
+        <View style={styles.allResultContainer}>
+          <View style={styles.marginIsland}></View>
+          {boundingBoxes.map((value: any, index: any) => {
+            // default 
+            let resTitle = "Loại thuốc cần uống";
+            let resDescription = "Không thể phát hiện được tên thuốc"
+            let colorTitle = "#1DD824"
+            let icon = <FontAwesome name="check" size={30} color={colorTitle} />
+            if (value.result == false) {
+              resTitle = 'Sai thuốc!!!';
+              colorTitle = "#E54343";
+              icon = <FontAwesome name="exclamation" size={30} color={colorTitle} />
+            }
+            if (value.name_drug != null) resDescription = value.name_drug
+            return (
+              <View style={styles.resultContainer} key={index}>
+                {icon}
+                <View style={styles.resultTitleContainer}>
+                  <Text style={[styles.textStyleResult, { color: colorTitle }]}>{resTitle}</Text>
+                  <Text style={styles.textStyleNameDrug}>{resDescription}</Text>
+                </View>
               </View>
-            </View>
-          )
-        })}
-        <View style={styles.marginIsland}></View>
-      </View>
-      <Canvas
-        style={[StyleSheet.absoluteFill]}
-        // style={StyleSheet.absoluteFillObject}
-        // style={{flex: 1}}
-        onContext2D={setCtx}
-        onLayout={event => {
-          setLayout(event.nativeEvent.layout);
-        }}
-      />
-      <View style={styles.truePillContainer}>
-        <Text style={[styles.title, {color: "black", fontSize: 22, marginTop: 15}]}>Đối chiếu với đơn thuốc</Text>
-        {table_content.map((value, index) => {
-          let colorTitle = "#1DD824"
-          if (value.need_number != value.use_number) {
-            colorTitle = "#E54343"
-          }
-          return (
-            <View style={styles.pillCard} key={index}>
-              <Text style={[styles.pillNameText, { color: colorTitle, borderLeftColor: colorTitle }]}>   {value.drug_name}</Text>
-              <Text style={styles.numberOfPillText}>   Số viên thuốc cần uống: {value.need_number}</Text>
-              <Text style={[styles.numberOfPillText, {marginBottom: 10}]}>   Số viên thuốc chẩn đoán: {value.use_number}</Text>
-            </View>
-          )
-        })}
-        <Card style={styles.card}>
-          <Card.Content>
-            <View>
-              <Text style={styles.end_text}>{end_text}</Text>
-            </View>
-          </Card.Content>
-        </Card>
-        <View style={styles.bottomContainer}>
-          <TouchableOpacity onPress={onReset} style={styles.resetButton}>
-            <Text>Go to home</Text>
-          </TouchableOpacity>
+            )
+          })}
+          <View style={styles.marginIsland}></View>
         </View>
-      </View>
+        <Canvas
+          style={[StyleSheet.absoluteFill, {top: -topMargin}]}
+          // style={StyleSheet.absoluteFillObject}
+          // style={{flex: 1}}
+          onContext2D={setCtx}
+          onLayout={event => {
+            setLayout(event.nativeEvent.layout);
+          }}
+        />
+        <View style={styles.truePillContainer}>
+          <Text style={[styles.title, { color: "black", fontSize: 22, marginTop: 15 }]}>Đối chiếu với đơn thuốc</Text>
+          {table_content.map((value, index) => {
+            let colorTitle = "#1DD824"
+            if (value.need_number != value.use_number) {
+              colorTitle = "#E54343"
+            }
+            return (
+              <View style={styles.pillCard} key={index}>
+                <Text style={[styles.pillNameText, { color: colorTitle, borderLeftColor: colorTitle }]}>   {value.drug_name}</Text>
+                <Text style={styles.numberOfPillText}>   Số viên thuốc cần uống: {value.need_number}</Text>
+                <Text style={[styles.numberOfPillText, { marginBottom: 10 }]}>   Số viên thuốc chẩn đoán: {value.use_number}</Text>
+              </View>
+            )
+          })}
+          <Card style={styles.card}>
+            <Card.Content>
+              <View>
+                <Text style={styles.end_text}>{end_text}</Text>
+              </View>
+            </Card.Content>
+          </Card>
+          <View style={styles.bottomContainer}>
+            <TouchableOpacity onPress={onReset} style={styles.resetButton}>
+              <Text style={{ fontSize: 20, color: "white", fontWeight: "bold" }}>Trở về trang chủ</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
 
-    </ScrollView >
-    // </View>
+      </ScrollView >
+    </View>
   );
 }
 
@@ -306,7 +296,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   resetButton: {
-    backgroundColor: 'white',
+    backgroundColor: '#34D7BE',
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,

@@ -1,14 +1,15 @@
 import * as React from "react";
-import { useRef } from "react";
+import { useRef, useCallback } from "react";
 import { StyleSheet } from "react-native";
 import { Camera } from "react-native-pytorch-core";
 import { useGlobalState, SCREEN_STATES } from "../src/component/GlobalHook";
 import detectObjects from "../src/pill_recognition/ObjectDetector";
 import PoseProcessing from "../src/pill_recognition/PoseProcessing";
+import SearchPillDetailScreen from "./SearchPillDetailScreen";
 const tip = require('../assets/tip.json')
 
 
-export default function PillCameraScreen({handleReset}) {
+export default function PillCameraScreen({ handleReset, setProcessPillDone}) {
   const cameraRef = useRef(null);
   const [tipUse, setTipUse] = useGlobalState('tipUse');
   const [screenState, setScreenState] = useGlobalState('screenState');
@@ -17,13 +18,12 @@ export default function PillCameraScreen({handleReset}) {
   const [modelSingleState, setModelSingleState] = useGlobalState('modelSingleState')
   const [modelMultipleState, setModelMultipleState] = useGlobalState('modelMultipleState')
 
-
   const takeTip = () => {
     let randTip = Math.floor(Math.random() * tip.length);
     setTipUse(tip[randTip])
   }
 
-  async function handleImage(capturedImage) {
+  handleImage = useCallback(async (capturedImage) => {
     takeTip();
     setScreenState(SCREEN_STATES.PILL_LOADING);
     setImage(capturedImage);
@@ -33,16 +33,15 @@ export default function PillCameraScreen({handleReset}) {
       const single_class_boxes = await detectObjects(capturedImage, modelSingleState);
       const post_process_boxes = PoseProcessing(single_class_boxes, multiple_class_boxes);
       setBoundingBoxes(post_process_boxes);
-
+      setProcessPillDone(true);
       // Switch to the PillResultsScreen to display the detected objects
-      setScreenState(SCREEN_STATES.PILL_RESULTS);
     } catch (err) {
       console.log(err)
       // In case something goes wrong, go back to the PillCameraScreen to take a new picture
       handleReset();
     }
-  }
-  
+  }, [])
+
   return (
     <Camera
       ref={cameraRef}

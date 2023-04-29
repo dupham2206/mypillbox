@@ -14,17 +14,13 @@ export default function TipScreen() {
 
     return (
         <View style={styles.container}>
-            <TurnBack backgroundColorText={null} colorText="white" text="Tip sức khỏe"/>
-            <ScrollView>
+            <TurnBack backgroundColorText={null} colorText="white" text="Tip sức khỏe" />
+            <ScrollView style={{backgroundColor: "white"}}>
                 {tip.map((value, index) => {
                     return (
-                        <Card style={styles.card} key={index}>
-                            <Card.Content>
-                                <View>
-                                    <Text style={styles.text}>{value}</Text>
-                                </View>
-                            </Card.Content>
-                        </Card>
+                        <View style={styles.card} key={index}>
+                            <Text style={styles.text}>{value}</Text>
+                        </View>
                     )
                 })}
             </ScrollView>
@@ -34,7 +30,7 @@ export default function TipScreen() {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
     text: {
         fontSize: 20,
@@ -42,7 +38,11 @@ const styles = StyleSheet.create({
     card: {
         marginLeft: "5%",
         marginRight: "5%",
+        padding: "5%",
         marginTop: 20,
+        borderColor: "#34D7BE",
+        borderWidth: 3,
+        borderRadius: 20,
     },
     turnback: {
         height: 10,

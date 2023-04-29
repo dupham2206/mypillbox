@@ -5,19 +5,19 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import { color } from 'react-native-reanimated';
 import { useGlobalState, SCREEN_STATES } from "./GlobalHook";
 
-export default function TurnBack({ backgroundColorText, colorText, handleReset, text, backState }) {
+export default function TurnBack({ backgroundColorText, colorText, handleReset, text, backState}) {
     const [screenState, setScreenState] = useGlobalState('screenState');
 
     const changeBackScreen = () => {
         if (handleReset == undefined && backState == undefined)
             setScreenState(SCREEN_STATES.HOMEPAGE)
-	if (handleReset == undefined && backState == undefined)
+        else if (handleReset == undefined && backState !== undefined)
             setScreenState(backState)
         else
             handleReset()
     }
     return (
-        <View style={[styles.container, {backgroundColor: backgroundColorText}]}>
+        <View style={[styles.container, { backgroundColor: backgroundColorText }]}>
             <TouchableOpacity style={styles.touch} onPress={changeBackScreen}>
                 <Ionicons name="chevron-back-outline" size={30} color={colorText} />
                 <Text style={[styles.text, { color: colorText }]}>{text}</Text>

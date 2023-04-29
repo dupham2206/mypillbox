@@ -11,7 +11,7 @@ import TesseractOcr, {
   useEventListener,
 } from 'react-native-tesseract-ocr';
 
-export default function OCRLoadingScreen() {
+export default function OCRLoadingScreen({handleCancelOCR}) {
   const [progress, setProgress] = useGlobalState('progressOCR');
   const [tipUse, setTipUse] = useGlobalState('tipUse');
 
@@ -21,7 +21,7 @@ export default function OCRLoadingScreen() {
 
   return (
     <View style={styles.container}>
-      <TurnBack backgroundColorText={styles.tipContainer.backgroundColor} colorText="black" text="Trích xuất thông tin đơn thuốc" />
+      <TurnBack backgroundColorText={styles.tipContainer.backgroundColor} colorText="black" text="Trích xuất thông tin đơn thuốc" handleReset={handleCancelOCR}/>
       <View style={styles.tipContainer}>
         <View style={styles.bulbIcon}>
           <FoundationIcon name="lightbulb" size={90} color='#34D7BE' />

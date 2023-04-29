@@ -22,7 +22,7 @@ const defaultPickerOptions = {
     width: DEFAULT_WIDTH,
 };
 
-export default function OCRStartScreen() {
+export default function OCRStartScreen({handleResetOCR, setProcessPresDone}) {
     const [progress, setProgress] = useGlobalState('progressOCR');
     const [screenState, setScreenState] = useGlobalState('screenState');
     const [OCRData, setOCRData] = useGlobalState('OCRData')
@@ -73,14 +73,14 @@ export default function OCRStartScreen() {
             console.error(err);
         }
 
-        setScreenState(SCREEN_STATES.OCR_RESULT);
+        setProcessPresDone(true);
         setProgress(0);
         return;
     };
 
     return (
         <View style={styles.container}>
-            <TurnBack colorText={styles.title.color} backgroundColorText={null} text="Chọn ảnh đơn thuốc"/>
+            <TurnBack colorText={styles.title.color} backgroundColorText={null} text="Chọn ảnh đơn thuốc" handleReset={handleResetOCR}/>
             <View style={styles.header}>
                 <Fontisto name="prescription" size={120} style={styles.icon} color='white' />
                 <Text style={styles.title}>Trích xuất{'\n'}đặc trưng{'\n'}từ đơn thuốc</Text>

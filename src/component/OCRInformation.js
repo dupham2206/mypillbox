@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { TextInput, Switch, Card, Button } from 'react-native-paper';
 import DatePicker from 'react-native-date-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,15 +9,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Toast from 'react-native-toast-message';
 import { scheduleNotification } from './Notification';
 import { useGlobalState, SCREEN_STATES } from "./GlobalHook";
-
-const datetoStringHM = (date) => {
-  let hour = date.getHours().toString()
-  if (hour.length == 1) hour = '0' + hour
-  let minute = date.getMinutes().toString()
-  if (minute.length == 1) minute = '0' + minute
-  let newtime = hour + ":" + minute;
-  return newtime
-}
+import { dateToStringYMD, dateToStringHM } from '../ocr/dateToString';
 
 export default function OCRInformation({ index }) {
   const [OCRData, setOCRData] = useGlobalState('OCRData');
@@ -33,9 +25,9 @@ export default function OCRInformation({ index }) {
   const [dateStart, setDateStart] = useState("Bắt đầu");
   const [dateEnd, setDateEnd] = useState("Kết thúc");
   const [numberPill, setNumberPill] = useState("1");
-  const [timeMorText, setTimeMorText] = useState(datetoStringHM(OCRData[index].time_morning));
-  const [timeAftText, setTimeAftText] = useState(datetoStringHM(OCRData[index].time_noon));
-  const [timeNigText, setTimeNigText] = useState(datetoStringHM(OCRData[index].time_night));
+  const [timeMorText, setTimeMorText] = useState(dateToStringHM(OCRData[index].time_morning));
+  const [timeAftText, setTimeAftText] = useState(dateToStringHM(OCRData[index].time_noon));
+  const [timeNigText, setTimeNigText] = useState(dateToStringHM(OCRData[index].time_night));
   const [screenState, setScreenState] = useGlobalState('screenState');
 
 
@@ -122,13 +114,6 @@ export default function OCRInformation({ index }) {
     });
   }
 
-  const dateToStringYMD = (date) => {
-    let month = date.getMonth() + 1; //months from 1-12
-    let day = date.getDate();
-    let year = date.getFullYear();
-    newdate = year + "-" + month + "-" + day;
-    return newdate
-  }
   const checkSave = () => {
     for (let i = 0; i < OCRData.length; ++i) {
       console.log(i, OCRData[i].is_morning, OCRData[i].is_noon, OCRData[i].is_night);
@@ -140,7 +125,6 @@ export default function OCRInformation({ index }) {
     return true
   }
   return (
-    <ScrollView>
       <View style={styles.bigCard}>
         <View style={styles.card}>
           <Text style={styles.textHeader}>Tên thuốc</Text>
@@ -173,9 +157,9 @@ export default function OCRInformation({ index }) {
             <Text style={styles.textHeader}>Thời gian dùng thuốc:</Text>
           </View>
           <View style={[styles.twoColumn, styles.card, styles.chooseDateContainer]}>
-            <View style={[styles.textNormalContainer, {width: "45%", backgroundColor: "#34D7BE", marginRight: "5%"}]}>
+            <View style={[styles.textNormalContainer, { width: "45%", backgroundColor: "#34D7BE", marginRight: "5%" }]}>
               <TouchableOpacity onPress={() => setOpenStartDate(true)}>
-                <Text style={[styles.textNormal, {textAlign: "center", color: "white", fontWeight: "bold"}]}>{dateStart}</Text>
+                <Text style={[styles.textNormal, { textAlign: "center", color: "white", fontWeight: "bold" }]}>{dateStart}</Text>
               </TouchableOpacity>
               <DatePicker
                 title="Chọn ngày bắt đầu"
@@ -201,9 +185,9 @@ export default function OCRInformation({ index }) {
                 }}
               />
             </View>
-            <View style={[styles.textNormalContainer, {width: "45%", backgroundColor: "#34D7BE", marginLeft: "5%"}]}>
+            <View style={[styles.textNormalContainer, { width: "45%", backgroundColor: "#34D7BE", marginLeft: "5%" }]}>
               <TouchableOpacity onPress={() => setOpenEndDate(true)}>
-                <Text style={[styles.textNormal, {textAlign: "center", color: "white", fontWeight: "bold"}]}>{dateEnd}</Text>
+                <Text style={[styles.textNormal, { textAlign: "center", color: "white", fontWeight: "bold" }]}>{dateEnd}</Text>
               </TouchableOpacity>
 
               <DatePicker
@@ -234,7 +218,7 @@ export default function OCRInformation({ index }) {
         </View>
         <View style={styles.card}>
           <Text style={styles.textHeader}>Đặt giờ uống thuốc</Text>
-          <View style={[styles.twoColumn, styles.textNormalContainer, { marginBottom: 20 }]}>
+          <View style={[styles.twoColumn, styles.textNormalContainer, { marginBottom: 10 }]}>
 
             <TouchableOpacity style={{ width: "50%" }}
               onPress={() => {
@@ -264,7 +248,7 @@ export default function OCRInformation({ index }) {
                 temp = OCRData
                 temp[index].time_morning = date
                 setOCRData(temp)
-                setTimeMorText(datetoStringHM(date))
+                setTimeMorText(dateToStringHM(date))
               }}
               onCancel={() => {
                 setOpenMor(false);
@@ -280,7 +264,7 @@ export default function OCRInformation({ index }) {
               <Text style={[styles.textNormal, styles.rightBookTime, { backgroundColor: "white", color: "black" }]}>{checkedMorning ? timeMorText : ""}</Text>
             )}
           </View>
-          <View style={[styles.twoColumn, styles.textNormalContainer, { marginBottom: 20 }]}>
+          <View style={[styles.twoColumn, styles.textNormalContainer, { marginBottom: 10 }]}>
             <TouchableOpacity style={{ width: "50%" }}
               onPress={() => {
                 if (checkedAfternoon === false) setOpenAft(true);
@@ -309,7 +293,7 @@ export default function OCRInformation({ index }) {
                 temp = OCRData
                 temp[index].time_noon = date
                 setOCRData(temp)
-                setTimeAftText(datetoStringHM(date))
+                setTimeAftText(dateToStringHM(date))
               }}
               onCancel={() => {
                 setOpenAft(false);
@@ -325,7 +309,7 @@ export default function OCRInformation({ index }) {
               <Text style={[styles.textNormal, styles.rightBookTime, { backgroundColor: "white", color: "black" }]}>{checkedAfternoon ? timeAftText : ""}</Text>
             )}
           </View>
-          <View style={[styles.twoColumn, styles.textNormalContainer, { marginBottom: 20 }]}>
+          <View style={[styles.twoColumn, styles.textNormalContainer, { marginBottom: 10 }]}>
             <TouchableOpacity style={{ width: "50%" }}
               onPress={() => {
                 if (checkedNight === false) setOpenNig(true);
@@ -352,7 +336,7 @@ export default function OCRInformation({ index }) {
                 temp = OCRData
                 temp[index].time_night = date
                 setOCRData(temp)
-                setTimeNigText(datetoStringHM(date))
+                setTimeNigText(dateToStringHM(date))
               }}
               onCancel={() => {
                 setOpenNig(false);
@@ -369,15 +353,14 @@ export default function OCRInformation({ index }) {
             )}
           </View>
         </View>
+        {
+          index === OCRData.length - 1 && (
+            <TouchableOpacity style={[styles.saveButton]} onPress={saveOCRdata}>
+              <FontAwesome5 name="save" size={35} color='white' />
+              <Text style={styles.saveTextButton}>Lưu đơn thuốc</Text>
+            </TouchableOpacity>)
+        }
       </View>
-      {
-        index === OCRData.length - 1 && (
-          <TouchableOpacity style={[styles.saveButton]} onPress={saveOCRdata}>
-            <FontAwesome5 name="save" size={35} color='white' />
-            <Text style={styles.saveTextButton}>Lưu đơn thuốc</Text>
-          </TouchableOpacity>)
-      }
-    </ScrollView >
   );
 }
 
@@ -434,17 +417,16 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     flexDirection: 'row',
-    marginLeft: "22%",
-    marginRight: "22%",
-    height: 60,
-    marginTop: 10,
+    marginLeft: "25%",
+    marginRight: "25%",
+    height: 50,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 10,
-    backgroundColor: "#339DAD"
+    backgroundColor: "#34D7BE"
   },
   saveTextButton: {
-    fontSize: 25,
+    fontSize: 22,
     marginLeft: 5,
     fontWeight: "bold",
     color: "white"
@@ -453,12 +435,14 @@ const styles = StyleSheet.create({
     marginLeft: 5,
     marginRight: 5,
     marginTop: 10,
-    marginBottom: 10,
+    marginBottom: 5,
   },
   bigCard: {
     backgroundColor: "white",
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
+    height: "100%",
+    // backgroundColor: "red",
   },
   smallCard: {
     margin: "2%",

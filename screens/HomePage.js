@@ -1,20 +1,22 @@
 import * as React from "react";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useEffect } from "react";
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from "react-native";
 import ButtonHomePage from "../src/component/ButtonHomePage";
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import LinearGradient from 'react-native-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { useGlobalState, SCREEN_STATES } from "../src/component/GlobalHook";
-
+import { dateToStringYMD, dateToStringHM } from "../src/ocr/dateToString";
 
 export default function HomePage() {
   const [screenState, setScreenState] = useGlobalState('screenState');
+  const [islandData, setIsLandData] = React.useState([]);
 
   const changeToCamera = async () => {
     // TODO
     let value = await AsyncStorage.getItem('@schedule');
-    if(value == null){
+    if (value == null) {
       Toast.show({
         type: 'error',
         text1: 'Không thể truy cập nhận dạng thuốc',
@@ -42,6 +44,39 @@ export default function HomePage() {
   const changeToTip = () => {
     setScreenState(SCREEN_STATES.TIP)
   }
+  const takeDrugNeed = async () => {
+    let schedules_string = await AsyncStorage.getItem('@schedule');
+    let schedules = JSON.parse(schedules_string)
+
+    results = []
+    let time_now = new Date()
+    is_morning_now = (time_now.getHours() <= 12)
+    is_night_now = (time_now.getHours() >= 19)
+    is_noon_now = (time_now.getHours() > 12 && time_now.getHours() < 19)
+
+    let schedules_today = schedules[dateToStringYMD(time_now)]
+    for (const scheduleDrug of schedules_today) {
+      if (scheduleDrug.date_start > time_now || scheduleDrug.date_end < time_now)
+        continue
+      if (is_morning_now & scheduleDrug.is_morning)
+        results.push({ drug_name: scheduleDrug.drug_name, time: scheduleDrug.time_morning })
+      if (is_noon_now & scheduleDrug.is_noon)
+        results.push({ drug_name: scheduleDrug.drug_name, time: scheduleDrug.time_noon })
+      if (is_night_now & scheduleDrug.is_night)
+        results.push({ drug_name: scheduleDrug.drug_name, time: scheduleDrug.time_night })
+    }
+    setIsLandData(results.sort((a, b) => {
+      if(a.time > b.time)
+        return 1;
+      if(a.time < b.time)
+        return -1;
+    }))
+  }
+
+  useEffect(() => {
+    takeDrugNeed()
+  }, [])
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -70,14 +105,21 @@ export default function HomePage() {
               <Text style={styles.textActivity}>Thuốc sắp tới bạn cần uống</Text>
             </View>
             <View style={styles.dateContainer}>
-              <Text style={styles.textDate}>8.00 pm 09/04/23</Text>
+              <Text style={styles.textDate}>{dateToStringYMD(new Date())}</Text>
             </View>
           </View>
           <View style={styles.lineIsland} />
-          <View style={styles.contentIsland}>
-            <Text style={styles.textContent}>Hoạt huyết dưỡng não</Text>
-            <Text style={styles.textContent}>Đinh lăng bạch quả</Text>
-          </View>
+          <ScrollView style={styles.contentIsland}>
+            {islandData.map((value, index) => {
+              let time = new Date(value.time)
+              let time_string = dateToStringHM(time)
+              return <View style={styles.lineContent} key={index}>
+                <Text style={styles.textContent}>{value.drug_name}</Text>
+                <Text style={[styles.textDate, {color: "black", marginRight: "10%"}]}>{time_string}</Text>
+              </View>
+            })
+            }
+          </ScrollView>
         </View>
       </View>
       <View style={styles.subject}>
@@ -209,8 +251,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   contentIsland: {
-    marginTop: "5%",
-    height: "65%"
   },
   textDate: {
     fontWeight: "bold",
@@ -257,4 +297,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#34D7BE',
     borderBottomWidth: 1,
   },
+  lineContent: {
+    flexDirection: "row",
+    justifyContent: 'space-between',
+    marginBottom: "2%", 
+  }
 });
