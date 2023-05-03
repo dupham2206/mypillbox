@@ -14,3 +14,4 @@ docker run --privileged --name pillbox_app -it -e IP_ADB={{YOUR_IP_ADDRESS}} myp
 Example:
 ```
 docker run --privileged --name pillbox_app -it -e IP_ADB=192.168.55.102 mypillbox
+```
