@@ -27,10 +27,11 @@ RUN --mount=type=cache,target=/root/.cache \
 RUN --mount=type=cache,target=/root/.cache \
     cd mypillbox/android && chmod +x gradlew  && ./gradlew clean
 
+ENV IP_ADB=OFFLINE
 
-CMD adb devices \
+CMD --mount=type=cache,target=/root/.cache \ 
+    if [ $IP_ADB == "OFFLINE" ]; then echo "connect with USB" && adb devices; \
+    else echo "connect with WIFI" && adb kill-server && adb connect ${IP_ADB}:5555 && adb devices; fi \
     && cd mypillbox && npx react-native run-android \
     && cd mypillbox && npx react-native start
-
-
 
