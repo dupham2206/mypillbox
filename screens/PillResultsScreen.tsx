@@ -57,7 +57,6 @@ const getDrugName = (id: Number) => {
 }
 
 const textBaselineAdjustment = Platform.OS == 'ios' ? 7 : 4;
-let end_text = "Bạn đang uống đúng thuốc."
 let table_content: Array<any> = []
 let countOutDescription = 0
 let partOfDay = getCurPartOfDay(new Date())
@@ -78,7 +77,7 @@ export default function PillResultsScreen({ onReset }: any) {
   const [layout, setLayout] = useState<LayoutRectangle | null>(null);
   const [image, setImage] = useGlobalState<any>('image');
   const [boundingBoxes, setBoundingBoxes] = useGlobalState<any>('boundingBoxes');
-
+  const [end_text, set_end_text] = useState("Bạn đang uống đúng thuốc.");
   const handleContext2D = useCallback(
     async (ctx: CanvasRenderingContext2D) => {
       setCtx(ctx);
@@ -131,7 +130,7 @@ export default function PillResultsScreen({ onReset }: any) {
       if (ok == false) {
         boundingBoxes[i].result = false
         boundingBoxes[i].name_drug = getDrugName(boundingBoxes[i].objectClass)
-        countOutDescription += 1
+        countOutDescription += 1      
       }
     }
     table_content = []
@@ -143,19 +142,18 @@ export default function PillResultsScreen({ onReset }: any) {
         ok: partOfDaySchedule[j]["numberPill"] == count[j]
       })
       if (partOfDaySchedule[j]["numberPill"] != count[j]) {
-        end_text = "Bạn đang uống sai thuốc."
+        set_end_text("Bạn đang uống sai thuốc.")
       }
     }
     if (countOutDescription != 0) {
-      end_text += " Chú ý " + countOutDescription + " viên thuốc sai, không cần uống trong " + mapToVi(partOfDay) + " nay."
+      set_end_text("Bạn đang uống sai thuốc." + " Chú ý " + countOutDescription + " viên thuốc sai, không cần uống trong " + mapToVi(partOfDay) + " nay.")
     }
     if (table_content.length == 0) {
-      end_text = mapToVi(partOfDay) + " nay bạn không cần uống thuốc."
+      set_end_text(mapToVi(partOfDay) + " nay bạn không cần uống thuốc.")
     }
   }
 
   useEffect(() => {
-    end_text = "Bạn đang uống đúng thuốc."
     countOutDescription = 0
     partOfDay = getCurPartOfDay(new Date())
     getBboxResult();

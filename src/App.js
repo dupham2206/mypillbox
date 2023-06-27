@@ -121,7 +121,6 @@ export default function App() {
 
   useEffect(() => {
     loadModel()
-    console.log("CCC", cancel)
     if (processPillDone) {
       setProcessPillDone(false)
       if (cancel == false) {
@@ -131,7 +130,6 @@ export default function App() {
     }
     if (processPresDone) {
       setProcessPresDone(false)
-      console.log("AAA")
       if (cancel == false) {
         setScreenState(SCREEN_STATES.OCR_RESULT)
       }

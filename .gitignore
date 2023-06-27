@@ -62,5 +62,3 @@ buck-out/
 
 #.env file
 .env
-
-/assets/pill_images/

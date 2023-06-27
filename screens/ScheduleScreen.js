@@ -95,7 +95,6 @@ export default ScheduleScreen = () => {
         //     // return <Text>Hãy chọn ngày ở bên dưới!</Text>
         //     setChooseDay(curDate.getUTCDate())
         // }
-        console.log(chooseDate)
         let curDateForDrug = chooseDate
         curDateForDrug.setDate(chooseDay)
         curDateString = dateToStringYMD(curDateForDrug)
@@ -104,7 +103,7 @@ export default ScheduleScreen = () => {
             let data = curDrug.map((value, index) => {
                 return <View style={[styles.container, { flexDirection: "row" }]} key={index}>
                     <View style={styles.imageContainer}>
-                        <Image source={pillInfo[parseInt(value.id[0]) + 1].link_image} resizeMode="cover" style={styles.image} />
+                        <Image source={pillInfo[parseInt(value.id[0]) - 1].link_image} resizeMode="cover" style={styles.image} />
                     </View>
                     <View style={styles.pillInfoContainer}>
                         <Text style={styles.textHeader}>Tên thuốc</Text>

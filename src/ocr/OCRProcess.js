@@ -45,6 +45,15 @@ export function removeAccents(str) {
     return str;
 }
 
+export function longestPrefixSame(str1, str2) {
+    for (let i = 0; i < Math.min(str1.length, str2.length); i += 1) {
+        if (str1[i] !== str2[i]) {
+            return i;
+        }
+    }
+    return Math.min(str1.length, str2.length);
+}
+
 export function longestCommonSubsequence(a, b) {
     const matrix = Array(a.length + 1).fill().map(() => Array(b.length + 1).fill(0));
     for (let i = 1; i < a.length + 1; i++) {
